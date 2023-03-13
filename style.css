@@ -1,0 +1,20 @@
+.reg {
+    display: flex;
+    height: 50px;
+    text-align: center;
+}
+.usersdiv {
+    display: flex;
+    padding: 1px;
+}
+.password {
+    display: flex;
+}
+.invise {
+    display: none;
+
+}
+.visible {
+    display: flex;
+    flex-direction: column;
+}

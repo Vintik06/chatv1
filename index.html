@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body> 
+    <div class="reg"  id="usersdiv">
+        <div class="usersdiv">
+            <p>user</p>
+            <input id="userName" type="text">
+        </div>
+        <div class="password">
+            <p>password</p>
+            <input id="pass" type="text">
+            <button id="btn">go</button>
+        </div>
+    </div>
+    <div id="datachat" class="invise">
+        <div id="block"> 
+            <input id="chat" type="text">
+            <button id="send">+</button>
+        </div>
+        <div id="chatdata"> </div>
+    </div>
+
+    
+   
+    <script type="module">
+       // Import the functions you need from the SDKs you need
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+        import { getDatabase, set, update, ref ,push, child, onValue, get} from
+        "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyCOG3964bhuPhNpGZHv6eMbhP_ugB6zS64",
+          authDomain: "chat-e0bcc.firebaseapp.com",
+          projectId: "chat-e0bcc",
+          storageBucket: "chat-e0bcc.appspot.com",
+          messagingSenderId: "132080808695",
+          appId: "1:132080808695:web:3483ae8a5f8fdcd426d9f2",
+          measurementId: "G-2JSZFF54P6",
+          databaseURL: " https://chat-e0bcc-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+
+        const starCountRef1 = ref(database, 'posts');
+    onValue(starCountRef1, (snapshot) => {
+        snapshot.forEach(childSnapshot => {
+            console.log(childSnapshot.val());
+            const name = childSnapshot.val().name;
+            const key = childSnapshot.key;
+            const post = childSnapshot.val().post;
+            let para = document.createElement("p");
+            para.innerHTML = name + " " + post;
+            para.id = "id" + key;
+            document.querySelector('#chatdata').appendChild(para);
+    })
+    
+    })
+    const userdiv = document.getElementById("usersdiv");
+    const chat = document.getElementById("datachat");
+    const btn = document.getElementById("btn");
+    const userName = document.getElementById("userName");
+    const pass = document.getElementById("pass");
+    const send = document.getElementById("send");
+    const inputchat = document.getElementById("chat");
+    const account = localStorage.getItem("account");
+
+    let usersArray = [];
+    let passArray = [];
+
+    if (localStorage.getItem("account") !== null) {
+        userdiv.classList.add("invise");
+        chat.classList.add("visible");
+    }
+
+            
+            
+            send.addEventListener("click", () => {
+                document.querySelector('#chatdata').innerHTML = '';
+                const now = Date.now();
+                update(ref(database, 'posts/' + now), {
+                    name: account,
+                    post: inputchat.value,
+                });
+            })
+
+
+            btn.addEventListener("click", () => {
+        if (!usersArray.includes(userName.value)) {
+            set(ref(database, 'users/' + userName.value), {
+                        name: userName.value,
+                        pass: pass.value,
+                        
+                    })
+                    alert("ви зареєструвалися!");
+        } else {
+            const index = usersArray.indexOf(userName.value);
+
+            if (passArray[index] == pass.value) {
+                localStorage.setItem("account", userName.value);
+                alert("ви увійшли!");
+                userdiv.classList.add("invise");
+                chat.classList.add("visible");
+                
+                console.log(userName);
+            } else {
+                alert("таке імя вже існує або неправильний пароль!");
+            }
+        }
+    })
+
+    
+    </script>
+</body>
+</html>
