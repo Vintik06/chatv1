@@ -4,28 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
 </head>
-<body> 
-    <div class="reg"  id="usersdiv">
-        <div class="usersdiv">
-            <p>user</p>
-            <input id="userName" type="text">
-        </div>
-        <div class="password">
-            <p>password</p>
-            <input id="pass" type="text">
-            <button id="btn">go</button>
-        </div>
-    </div>
-    <div id="datachat" class="invise">
-        <div id="block"> 
-            <input id="chat" type="text">
-            <button id="send">+</button>
-        </div>
-        <div id="chatdata"> </div>
-    </div>
+<body>
+    user
+    <input type="text" id="userName">
+    pass
+    <input type="text" id="pass">
+    <button id="btn">go</button>
+    <input type="file" id="file-input" name="myFile">
+    <button id="btn1">add file</button>
+    <input type="text" id="message" name="message">
+    <button id="messageBtn">send message</button>
+    <div class="data"></div>
 
     
    
@@ -46,11 +37,9 @@
           measurementId: "G-2JSZFF54P6",
           databaseURL: " https://chat-e0bcc-default-rtdb.europe-west1.firebasedatabase.app"
         };
-      
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
+              // Initialize Firebase
+              const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-
 
         const starCountRef1 = ref(database, 'posts');
     onValue(starCountRef1, (snapshot) => {
@@ -62,64 +51,82 @@
             let para = document.createElement("p");
             para.innerHTML = name + " " + post;
             para.id = "id" + key;
-            document.querySelector('#chatdata').appendChild(para);
+            document.querySelector('.data').appendChild(para);
+        })
     })
-    
-    })
-    const userdiv = document.getElementById("usersdiv");
-    const chat = document.getElementById("datachat");
+
     const btn = document.getElementById("btn");
     const userName = document.getElementById("userName");
     const pass = document.getElementById("pass");
-    const send = document.getElementById("send");
-    const inputchat = document.getElementById("chat");
-    const account = localStorage.getItem("account");
+
+    const messageBtn = document.getElementById("messageBtn");
+    const message = document.getElementById("message");
 
     let usersArray = [];
     let passArray = [];
 
-    if (localStorage.getItem("account") !== null) {
-        userdiv.classList.add("invise");
-        chat.classList.add("visible");
-    }
+    const starCountRef2 = ref(database, 'users');
+        onValue(starCountRef2, (snapshot) => {
+            snapshot.forEach(childSnapshot => {
+                console.log(childSnapshot.val().name);
+                usersArray.push(childSnapshot.val().name);
+                passArray.push(childSnapshot.val().pass)
+                console.log(usersArray);
+        })
 
-            
-            
-            send.addEventListener("click", () => {
-                document.querySelector('#chatdata').innerHTML = '';
-                const now = Date.now();
-                update(ref(database, 'posts/' + now), {
-                    name: account,
-                    post: inputchat.value,
-                });
-            })
+    messageBtn.addEventListener("click", () => {
+        const myName = localStorage.getItem("userName");
+        document.querySelector('.data').innerHTML = "";
+        const now = Date.now();
+        set(ref(database, 'posts/' + now), { 
+            name: myName,
+            post: message.value
+        });
+    })
 
 
-            btn.addEventListener("click", () => {
+    btn.addEventListener("click", () => {
         if (!usersArray.includes(userName.value)) {
             set(ref(database, 'users/' + userName.value), {
                         name: userName.value,
                         pass: pass.value,
-                        
                     })
+
                     alert("ви зареєструвалися!");
         } else {
             const index = usersArray.indexOf(userName.value);
 
             if (passArray[index] == pass.value) {
-                localStorage.setItem("account", userName.value);
+                localStorage.setItem("userName", userName.value);
                 alert("ви увійшли!");
-                userdiv.classList.add("invise");
-                chat.classList.add("visible");
-                
-                console.log(userName);
             } else {
                 alert("таке імя вже існує або неправильний пароль!");
             }
         }
-    })
+    })    
+})
+
+const fileInput = document.getElementById('file-input');
+const btn1 = document.getElementById('btn1');
+btn1.addEventListener("click", () => {
+    const file = fileInput.files[0];
+
+// Create a reference to the file in Firebase Storage
+const fileRef = storageRef.child(file.name);
+
+// Upload the file to Firebase Storage
+fileRef.put(file).then(() => {
+  console.log('File uploaded successfully!');
+}).catch((error) => {
+  console.error('Error uploading file:', error);
+});
 
     
+
+})
+
+
+
     </script>
 </body>
 </html>
